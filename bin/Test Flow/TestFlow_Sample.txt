@@ -1,0 +1,353 @@
+[TEST_SETTINGS]
+MD5                       = 
+ENABLE_DEBUG_MSG          = TRUE
+STOP_ON_FAILURE           = TRUE
+EXPORT_CSV_FILE		  = TRUE
+LOOP_TEST                 = 1
+FAIL_RETRY                = 3
+
+
+[DUT_SETTINGS]
+CHIP_TYPE                 = BCM_4708			//MTK_7668,BCM_4708
+TEST_TYPE		  = TELNET
+IP                        = 192.168.1.1
+PORT                      = 23
+LOGIN_ID                  = admin
+LOGIN_PWD                 = 1234
+LOGIN_ID_PROMPT           = login:
+LOGIN_PWD_PROMPT          = Password:
+SHELL_PROMPT              = #
+WRITE_TO_EFUSE            = TRUE
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// TEST_FLOW
+//------------------------------------------------------------------------------------------------
+[TEST_FLOW]
+//FOT_TEST
+
+CONNECT_TEST_EQUIPMENT
+LOAD_TEST_PARAMETER
+
+INSERT_DUT_2G
+WIFI_TX_CALIBRATION_2G
+WIFI_FREQUENCY_ACCURACY_2G
+WIFI_TX_VERIFICATION_2G
+WIFI_RX_SENSITIVITY_2G
+//WIFI_RX_SWEEP_2G
+
+//INSERT_DUT_5G
+//WIFI_RX_GAIN_CALIBRATION_5G
+//WIFI_TX_CALIBRATION_5G
+//WIFI_FREQUENCY_ACCURACY_5G
+//WIFI_TX_VERIFICATION_5G
+//WIFI_RX_SENSITIVITY_5G
+
+//COMMIT_EFUSE
+//DUMP_EFUSE
+
+REMOVE_DUT
+DISCONNECT_TEST_EQUIPMENT
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// FOT_TEST
+//------------------------------------------------------------------------------------------------
+[FOT_TEST]
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// CONNECT_TEST_EQUIPMENT
+// 
+// ATC_CONNECT_TESTER
+// - MEASURER    : [NI],[IQXEL80],[IQXEL-M8],[IQXEL-M2W]
+// - IP:ROUT     : [192.168.100.254:A],[192.168.100.254:B]
+// - VSAVSG      : [LEFT],[RIGHT],[1],[2],[3],[4]
+// - LOCKTIMEOUT : sec
+//  
+//
+//------------------------------------------------------------------------------------------------
+[CONNECT_TEST_EQUIPMENT]
+ATC_CONNECT_TESTER(MEASURER=IQXEL80,IP=192.168.100.254,ROUTE=1,VSAVSG=1,LOCKTIMEOUT=300)
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// LOAD_TEST_PARAMETER
+//
+// LOAD_PATHLOSS
+// - PATH    : 
+//
+//------------------------------------------------------------------------------------------------
+[LOAD_TEST_PARAMETER]
+LOAD_PATHLOSS(PATH=path_loss.csv)
+LOAD_IQ_PARAMETER(11ag_ph_corr_mode=2,11ag_ch_estimate=3,11ag_sym_tim_corr=2,11ag_freq_sync=2,11ag_ampl_track=1,11b_DCremove11b_flag=0,11b_eq_taps=1,11b_method_11b=1,11n_enableAmplitudeTracking=0,11n_decodePSDU=0,11n_frequencyCorr=2,11n_enableFullPacketChannelEst=1,11n_enablePhaseCorr=1,11n_enableSymTimingCorr=1,11ac_enableAmplitudeTracking=0,11ac_decodePSDU=0,11ac_frequencyCorr=3,11ac_enableFullPacketChannelEst=1,11ac_enablePhaseCorr=1,11ac_enableSymTimingCorr=1)
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// INSERT_DUT
+//------------------------------------------------------------------------------------------------
+[INSERT_DUT_2G]
+ATC_INSERT_DUT(IF2G=wl1)
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+[WIFI_TX_CALIBRATION_2G]
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_N_CAL,CH=6,RATE=MCS7,BW=20M,ANT=1,POWER=17,ANTNUM=3,BANDNUM=0).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_N_CAL,CH=6,RATE=MCS7,BW=20M,ANT=2,POWER=17,ANTNUM=3,BANDNUM=0).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_N_CAL,CH=6,RATE=MCS7,BW=20M,ANT=3,POWER=17,ANTNUM=3,BANDNUM=0).SPEC(PWR_LIMIT=3)
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// WIFI_FREQUENCY_ACCURACY
+//------------------------------------------------------------------------------------------------
+[WIFI_FREQUENCY_ACCURACY_2G]
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AG,CH=6,RATE=OFDM_54,BW=20M,ANT=1,POWER=17).SPEC(PPM=20).OPTION(MDELAY=50)
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// WIFI_TX_VERIFICATION
+//
+// WIFI_11AC_TX_VERIFY_ALL
+// - ANALYZE : [80211_B],[80211_AG],[80211_N],[80211_AC],[BLUETOOTH],[ZIGBEE],[80211_N_CAL]
+// - CH/FREQ
+// - RATE : [DSSS_1],[DSSS_2],[CCK_5_5],[CCK_11]
+//          [OFDM_6],[OFDM_9],[OFDM_12],[OFDM_18],[OFDM_24],[OFDM_36],[OFDM_48],[OFDM_54]
+//	    [MCS0],[MCS1]....[MCS31]
+//	    [1DH1],[1DH3],[1DH5],[2DH1],[2DH3],[2DH5],[3DH1],[3DH3],[3DH5]
+// - BW : [20M],[40M],[80M],[160M]
+// - ANT : [1],[2],[3],[4],[12],[123],[1234]
+// - POWER
+// 
+// - SPEC
+//   - POWER_H/POWER_L
+//   - EVM
+//   - MASK
+//   - PPM
+//
+// - OPTION
+//   - REMEASURE : [TRUE],[FALSE]
+//   - DEBUG : [TRUE],[FALSE]
+//   - MDELAY : ms
+// - 
+//------------------------------------------------------------------------------------------------
+[WIFI_TX_VERIFICATION_2G]
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_N,CH=6,RATE=MCS7,BW=20M,ANT=1,POWER=17).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-28).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_N,CH=6,RATE=MCS7,BW=20M,ANT=2,POWER=17).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-28).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_N,CH=6,RATE=MCS7,BW=20M,ANT=3,POWER=17).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-28).OPTION(MDELAY=50)
+
+//------------------------------------------------------------------------------------------------
+// WIFI_RX_SENSITIVITY
+//------------------------------------------------------------------------------------------------
+[WIFI_RX_SENSITIVITY_2G]
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_N,CH=6,RATE=MCS7,BW=20M,ANT=1,POWER=-68,PACKET=500,WAVEFORM=WiFi_HT20_MCS7.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_N,CH=6,RATE=MCS7,BW=20M,ANT=2,POWER=-68,PACKET=500,WAVEFORM=WiFi_HT20_MCS7.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_N,CH=6,RATE=MCS7,BW=20M,ANT=3,POWER=-68,PACKET=500,WAVEFORM=WiFi_HT20_MCS7.iqvsg).SPEC(PER=10).OPTION()
+
+
+//------------------------------------------------------------------------------------------------
+// WIFI_RX_SWEEP
+//------------------------------------------------------------------------------------------------
+[WIFI_RX_SWEEP_2G]
+RX_SWEEP(ANALYZE=80211_N,CH=7,RATE=MCS7,BW=20M,ANT=1,POWER=-70~-85/1,PACKET=500,WAVEFORM=WiFi_HT20_MCS7.iqvsg).SPEC(PER=10).OPTION()
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// INSERT_DUT
+//------------------------------------------------------------------------------------------------
+[INSERT_DUT_5G]
+ATC_INSERT_DUT(IF5G=wl0)
+
+
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+[WIFI_TX_CALIBRATION_5G]
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=36,RATE=MCS8,BW=20M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT20_S4_MCS8.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=52,RATE=MCS8,BW=20M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT20_S4_MCS8.iqref).SPEC(PWR_LIMIT=3)		
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=100,RATE=MCS8,BW=20M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT20_S4_MCS8.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=120,RATE=MCS8,BW=20M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT20_S4_MCS8.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=140,RATE=MCS8,BW=20M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT20_S4_MCS8.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=38,RATE=MCS9,BW=40M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT40_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=54,RATE=MCS9,BW=40M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT40_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)		
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=102,RATE=MCS9,BW=40M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT40_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=118,RATE=MCS9,BW=40M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT40_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=142,RATE=MCS9,BW=40M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT40_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=42,RATE=MCS9,BW=80M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT80_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=58,RATE=MCS9,BW=80M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT80_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)		
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=106,RATE=MCS9,BW=80M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT80_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=122,RATE=MCS9,BW=80M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT80_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)
+WIFI_11AC_TX_CALIBRATION(ANALYZE=80211_AC_CAL,CH=138,RATE=MCS9,BW=80M,ANT=1234,POWER=15,REF_FILE=WiFi_11AC_VHT80_S4_MCS9.iqref).SPEC(PWR_LIMIT=3)
+
+
+
+//------------------------------------------------------------------------------------------------
+// WIFI_RX_GAIN_CALIBRATION
+//------------------------------------------------------------------------------------------------
+[WIFI_RX_GAIN_CALIBRATION_5G]
+//WIFI_11AC_RX_CALIBRATION(ANALYZE=80211_AC,CH=40,RATE=MCS7,BW=20M,ANT=1,POWER=-70,PACKET=1000,WAVEFORM=STF_Fs160.iqvsg).SPEC().OPTION()
+//WIFI_11AC_RX_CALIBRATION(ANALYZE=80211_AC,CH=60,RATE=MCS7,BW=20M,ANT=1,POWER=-70,PACKET=1000,WAVEFORM=STF_Fs160.iqvsg).SPEC().OPTION()
+//WIFI_11AC_RX_CALIBRATION(ANALYZE=80211_AC,CH=112,RATE=MCS7,BW=20M,ANT=1,POWER=-70,PACKET=1000,WAVEFORM=STF_Fs160.iqvsg).SPEC().OPTION()
+//WIFI_11AC_RX_CALIBRATION(ANALYZE=80211_AC,CH=140,RATE=MCS7,BW=20M,ANT=1,POWER=-70,PACKET=1000,WAVEFORM=STF_Fs160.iqvsg).SPEC().OPTION()
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// WIFI_FREQUENCY_ACCURACY
+//------------------------------------------------------------------------------------------------
+[WIFI_FREQUENCY_ACCURACY_5G]
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=58,RATE=MCS0,BW=80M,ANT=1,POWER=15).SPEC(PPM=15).OPTION(MDELAY=50)
+
+
+
+//------------------------------------------------------------------------------------------------
+// WIFI_TX_VERIFICATION
+//------------------------------------------------------------------------------------------------
+[WIFI_TX_VERIFICATION_5G]
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=42,RATE=MCS9,BW=80M,ANT=1,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=42,RATE=MCS9,BW=80M,ANT=2,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=42,RATE=MCS9,BW=80M,ANT=3,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=42,RATE=MCS9,BW=80M,ANT=4,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=58,RATE=MCS9,BW=80M,ANT=1,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=58,RATE=MCS9,BW=80M,ANT=2,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=58,RATE=MCS9,BW=80M,ANT=3,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=58,RATE=MCS9,BW=80M,ANT=4,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=106,RATE=MCS9,BW=80M,ANT=1,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=106,RATE=MCS9,BW=80M,ANT=2,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=106,RATE=MCS9,BW=80M,ANT=3,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=106,RATE=MCS9,BW=80M,ANT=4,POWER=15).SPEC(POWER_H=1.5,POWER_L=1.5,EVM=-32).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=42,RATE=MCS0,BW=80M,ANT=1,POWER=18).SPEC(MASK=2).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=42,RATE=MCS0,BW=80M,ANT=2,POWER=18).SPEC(MASK=2).OPTION(MDELAY=50)
+WIFI_11AC_TX_VERIFY_ALL(ANALYZE=80211_AC,CH=42,RATE=MCS0,BW=80M,ANT=3,POWER=18).SPEC(MASK=2).OPTION(MDELAY=50)
+
+
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// WIFI_RX_SENSITIVITY
+//------------------------------------------------------------------------------------------------
+[WIFI_RX_SENSITIVITY_5G]
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=42,RATE=MCS9,BW=80M,ANT=1,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=42,RATE=MCS9,BW=80M,ANT=2,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=42,RATE=MCS9,BW=80M,ANT=3,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=42,RATE=MCS9,BW=80M,ANT=4,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=58,RATE=MCS9,BW=80M,ANT=1,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=58,RATE=MCS9,BW=80M,ANT=2,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=58,RATE=MCS9,BW=80M,ANT=3,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=58,RATE=MCS9,BW=80M,ANT=4,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=106,RATE=MCS9,BW=80M,ANT=1,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=106,RATE=MCS9,BW=80M,ANT=2,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=106,RATE=MCS9,BW=80M,ANT=3,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+WIFI_11AC_RX_VERIFY_PER(ANALYZE=80211_AC,CH=106,RATE=MCS9,BW=80M,ANT=4,POWER=-55,PACKET=500,WAVEFORM=WiFi_11AC_VHT80_S1_MCS9.iqvsg).SPEC(PER=10).OPTION()
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// COMMIT_EFUSE
+//------------------------------------------------------------------------------------------------
+[COMMIT_EFUSE]
+COMMIT_CALDATA()
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// DUMP_EFUSE
+//------------------------------------------------------------------------------------------------
+[DUMP_EFUSE]
+DUMP_DATA()
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// REMOVE_DUT
+//------------------------------------------------------------------------------------------------
+[REMOVE_DUT]
+//ATC_REBOOT_DUT(WAITREADY=70)
+ATC_REMOVE_DUT()
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+[DISCONNECT_TEST_EQUIPMENT]
+ATC_TESTER_RELEASE_CONTROL().RUNMODE(ALWAYS_RUN) 
+
+
+
+
+
+
+
